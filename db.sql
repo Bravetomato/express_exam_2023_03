@@ -1,7 +1,9 @@
+#DB 생성
 DROP DATABASE IF EXISTS wise_sayng;
 CREATE DATABASE wise_saying;
 USE wise_saying;
 
+#테이블 생성
 CREATE TABLE wise_saying (
     id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     regDate DATETIME NOT NULL,
