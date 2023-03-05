@@ -32,9 +32,20 @@ const wiseSayings = [
 
 app.get('/wise-sayings', async(req, res) => {
      const [rows] = await pool.query("SELECT * FROM wise_saying ORDER BY id DESC");
-    // SELECT * FROM wise_saying ORDER BY DESC 라는 쿼리를 실행하겠다.
+    // SELECT * FROM wise_saying ORDER BY id DESC 라는 쿼리를 실행하겠다.
      res.json(rows);
     // 담겨진 rows를 json으로 받겠다.
+});
+
+// 데이터 1개만 가져오는 단건 조회.
+// 주소창에 localhost:3000/wise_sayings/id를 넣으면 해당 id 데이터가 조회된다.
+app.get('/wise-sayings/:id', async(req, res) => {
+  const {id} = req.params;
+  const [rows] = await pool.query("SELECT * FROM wise_saying WHERE id = ?", [
+    id,
+  ]);
+
+  res.json(rows[0]);
 });
 
 app.listen(port, () => {
