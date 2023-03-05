@@ -3,12 +3,23 @@ import express from "express";
 const app = express();
 const port = 3000;
 
-app.get('/', (req, res) => {
-    res.send('Hello world!!!????');
-});
+const wiseSayings = [
+  {
+    content : "I am Ironman.",
+    author : "Tony Stark",
+  },
+  {
+    content : "I can do this all day.",
+    author : "Captain America",
+  },
+  {
+    content : "I have nothing to prove to you.",
+    author : "Captain Marvel",
+  },
+];
 
-app.get('/about', (req, res) => {
-  res.send('About!');
+app.get('/wise-sayings', (req, res) => {
+    res.json(wiseSayings);
 });
 
 app.listen(port, () => {
