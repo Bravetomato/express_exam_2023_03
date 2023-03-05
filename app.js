@@ -30,6 +30,7 @@ const wiseSayings = [
   },
 ];
 
+// 데이터 리스트 조회
 app.get('/wise-sayings', async(req, res) => {
      const [rows] = await pool.query("SELECT * FROM wise_saying ORDER BY id DESC");
     // SELECT * FROM wise_saying ORDER BY id DESC 라는 쿼리를 실행하겠다.
@@ -44,6 +45,12 @@ app.get('/wise-sayings/:id', async(req, res) => {
   const [rows] = await pool.query("SELECT * FROM wise_saying WHERE id = ?", [
     id,
   ]);
+
+  // 만약 없는 데이터 id를 조회했을 경우 오류 메세지 뜨도록.
+  if (rows.length == 0) {
+    res.status(404).send("not found");
+    return;
+  }
 
   res.json(rows[0]);
 });
