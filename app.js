@@ -55,37 +55,41 @@ app.get('/wise-sayings', async(req, res) => {
 //   res.json(rows[0]);
 // });
 
-//postman 으로 보낸 데이터 연동
-app.post('/wise-sayings/:id', async(req, res) => {
-    const { author, content } = req.body;
+// postman에서 id 지정해서 수정하기
+app.patch('/wise-sayings/:id', async(req, res) => {
+  const { id } = req.params;
+  const { author, content } = req.body;
+  const [rows] = await pool.query("SELECT * FROM wise_saying WhERE id = ?", [
+    id,
+  ]);
 
-    if(!author) {
-      res.status(400).json({
-        msg: "author required",
-      });
-      return;
-    }
+  if(rows.length == 0) {
+    res.status(404).send("not found");
+    return;
+  }
 
-    if(!content) {
-      res.status(400).json({
-        msg: "content required",
-      });
-      return;
-    }
-
-    const [rs] = await pool.query(
-      `INSERT INTO wise_saying
-      SET regDate = NOW(),
-      content = ?,
-      author = ?
-      `,
-      [content, author]
-    );
-
-    res.status(201).json({
-      id: rs.insertId,
+  if(!content) {
+    res.status(400).json({
+      msg: "content required",
     });
+    return;
+  }
+
+  const [rs] = await pool.query(
+    `UPDATE INTO wise_saying
+     SET content = ?,
+     author = ?,
+     WHERE id = ?
+    `,
+    [content, author, id]
+  );
+
+  res.status(201).json({
+    id,
+    author,
+    content
   });
+});
 
   app.get("/wise-sayings/:id", async (req, res) => {
     const { id } = req.params;
