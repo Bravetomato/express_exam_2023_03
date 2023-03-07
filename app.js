@@ -13,6 +13,7 @@ const pool = mysql.createPool({
 });
 
 const app = express();
+app.use(express.json);
 const port = 3000;
 
 const wiseSayings = [
@@ -40,20 +41,63 @@ app.get('/wise-sayings', async(req, res) => {
 
 // 데이터 1개만 가져오는 단건 조회.
 // 주소창에 localhost:3000/wise_sayings/id를 넣으면 해당 id 데이터가 조회된다.
-app.get('/wise-sayings/:id', async(req, res) => {
-  const {id} = req.params;
-  const [rows] = await pool.query("SELECT * FROM wise_saying WHERE id = ?", [
-    id,
-  ]);
+// app.get('/wise-sayings/:id', async(req, res) => {
+//   const {id} = req.params;
+//   const [rows] = await pool.query("SELECT * FROM wise_saying WHERE id = ?", [
+//     id,
+//   ]);
+//   // 만약 없는 데이터 id를 조회했을 경우 오류 메세지 뜨도록.
+//   if (rows.length == 0) {
+//     res.status(404).send("not found");
+//     return;
+//   }
 
-  // 만약 없는 데이터 id를 조회했을 경우 오류 메세지 뜨도록.
-  if (rows.length == 0) {
-    res.status(404).send("not found");
-    return;
-  }
+//   res.json(rows[0]);
+// });
 
-  res.json(rows[0]);
-});
+//postman 으로 보낸 데이터 연동
+app.post('/wise-sayings/:id', async(req, res) => {
+    const { author, content } = req.body;
+
+    if(!author) {
+      res.status(400).json({
+        msg: "author required",
+      });
+      return;
+    }
+
+    if(!content) {
+      res.status(400).json({
+        msg: "content required",
+      });
+      return;
+    }
+
+    const [rs] = await pool.query(
+      `INSERT INTO wise_saying
+      SET regDate = NOW(),
+      content = ?,
+      author = ?
+      `,
+      [content, author]
+    );
+
+    res.status(201).json({
+      id: rs.insertId,
+    });
+  });
+
+  app.get("/wise-sayings/:id", async (req, res) => {
+    const { id } = req.params;
+    const [rows] = await pool.query("SELECT * FROM wise_saying WhERE id = ?", [
+      id,
+    ]);
+    if (rows.length == 0) {
+      res.status(404).send("not found");
+      return;
+    }
+    res.json(rows[0]);
+  });
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
